@@ -28,3 +28,14 @@ key is in lastpass note on brainwallet
 conda create -n brainwallet python=3.7 python
 conda activate brainwallet
 
+or
+
+cd <here>
+python3 -m venv metabrainwallet
+metabrainwallet/bin/activate  # or, in windows: metabrainwallet/bin/activate.bat
+pip install --upgrade google-cloud-translate
+pip install --upgrade python-dotenv
+echo 'GOOGLE_APPLICATION_CREDENTIALS="${HOME}/projects/metabrainwallet/brainwallet-7e933180334f.json"' > .env
+# save contents of brainwallet-7e933180334f.json from lastpass/brainwallet to brainwallet-7e933180334f.json
+
+
