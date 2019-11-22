@@ -1,0 +1,3 @@
+#!/bin/bash
+. metabrainwallet/bin/activate
+./cachetranslations.py | tee cachetranslations.log
