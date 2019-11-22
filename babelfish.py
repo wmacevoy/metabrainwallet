@@ -38,7 +38,6 @@ class Babelfish:
 
     def translate(self,phrase):
         translations={}
-        print(repr(self._languages))
         for target in self._languages:
             if target == self.source:
                 translation=phrase

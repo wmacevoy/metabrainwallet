@@ -21,5 +21,16 @@ class TestBabelfish(TestCase):
             self.assertTrue(response != "")
             print(response)
 
+    def testNotAWord(self):
+        phrase="!#%!?"
+        babelfish = Babelfish()
+        for language in LANGUAGES_GOOGLE:
+            babelfish.clearLanguages()
+            babelfish.addLanguage(language)
+            response=babelfish.translate(phrase)
+            self.assertTrue(response != None)
+            self.assertTrue(response != "")
+            print(response)
+            
 if __name__ == '__main__':
     main()
