@@ -1,10 +1,15 @@
-import os,sqlite3
+import os,sys,sqlite3,datetime
 from badtable import BadTable
 from phrasetable import PhraseTable
 from translationtable import TranslationTable
+from __future__ import print_function
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 class Db:
     DEFAULT_DB_FILE = str(os.path.expanduser("metabrainwallet.db"))
+    DEFAULT_SLOW = 1.0
 
     def __init__(self, dbFile=DEFAULT_DB_FILE):
         self._connection = None
@@ -12,6 +17,7 @@ class Db:
         self._phrase = PhraseTable(self)
         self._translation = TranslationTable(self)
         self._dbFile = dbFile
+        self._slow = DEFAULT_SLOW
 
     @property
     def bad(self):
@@ -49,6 +55,26 @@ class Db:
 
     def cursor(self):
         return self.connection.cursor()
+
+    def execute(self,sql,parameters=None):
+        if parameters != None:
+            cursor=self.cursor()
+            t0 = datetime.datetime.now()
+            cursor.execute(sql,parameters)
+            t1 = datetime.datetime.now()            
+            delta = (t1 - t0).total_seconds()
+            if delta > self.slow:
+                print(f"slow: {sql} parameters={repr(parameters)} in {delta}s")
+            return cursor
+        else:
+            cursor=self.cursor()
+            t0 = datetime.datetime.now()
+            cursor.execute(sql)
+            t1 = datetime.datetime.now()            
+            delta = (t1 - t0).total_seconds()
+            if delta > self.slow:
+                print(f"slow: {sql} in {delta}s")
+            return cursor
 
     def createTables(self):
         self.bad.createTable()

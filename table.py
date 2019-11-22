@@ -35,14 +35,7 @@ class Table:
         return self.db.cursor()
 
     def execute(self,sql,parameters=None):
-        if parameters != None:
-            cursor=self.cursor()
-            cursor.execute(sql,parameters)
-            return cursor
-        else:
-            cursor=self.cursor()
-            cursor.execute(sql)
-            return cursor
+        return self.db.execute(sql,parameters)
 
     def createIndex(self,columns,unique=False):
         index=f"index_{self.name}_on_{'__'.join(columns)}"
