@@ -3,7 +3,7 @@
 import os,sys
 from google.cloud import translate_v2
 from languages import LANGUAGES_100M, LANGUAGES_GOOGLE
-from dotenv import load_dotenv, find_dotenv
+import dotenv, pathlib
 
 class Babelfish:
     def addCommonLanguages(self):
@@ -12,7 +12,7 @@ class Babelfish:
 
     def __init__(self,source='en'):
         if os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')==None:
-            load_dotenv(find_dotenv())
+            dotenv.load_dotenv(pathlib.Path('.') / '.env')
         self._source = source
         self._languages = set()
         self._client = None

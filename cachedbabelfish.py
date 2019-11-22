@@ -27,7 +27,6 @@ class CachedBabelfish(Babelfish):
                 translateds=self.db.translation.find(original,target)
                 if len(translateds)>0:
                     translation=translateds[0].content
-                    print(f"{self.source}/{phrase} => {target}/{translation} cached")
                 else:
                     response=self.client.translate(phrase, target, None, self.source)
                     translation=response['translatedText']
