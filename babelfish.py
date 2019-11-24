@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os,sys
+import os,sys,time
 from google.cloud import translate_v2
 from languages import LANGUAGES_100M, LANGUAGES_GOOGLE
 import dotenv, pathlib
@@ -36,6 +36,24 @@ class Babelfish:
             self._client = translate_v2.Client()
         return self._client
 
+    def close():
+        if self._client != None:
+            self._client.close()
+            self._client = None
+        return self._client
+        
+
+    def retryingTranslate(self,values,target_language=None,format_=None,source_language=None,customization_ids=(),model=None):
+        while True:
+            try:
+                response=self.client.translate(values,target_language,format_,ssource_language,customization_ids)
+                if resonse != None:
+                    return response
+            except:
+                print("Unexpected error:", sys.exc_info()[0])
+                self.close()
+                time.sleep(5)
+
     def translate(self,phrase):
         translations={}
         for target in self._languages:
@@ -49,8 +67,11 @@ class Babelfish:
     
 def babelfish(*words):
     babelfish = Babelfish()
-    for word in words:
-        print(repr(babelfish.translate(word)))
+    try:
+        for word in words:
+            print(repr(babelfish.translate(word)))
+    finally:
+        babelfish.close()
 
 def testBabelfish():
     babelfish("pidgin")
