@@ -15,6 +15,7 @@ class CachedBabelfish(Babelfish):
 
     def close(self):
         self.db.close()
+        super().close()
 
     def translate(self,phrase):
         translations={}
@@ -28,7 +29,7 @@ class CachedBabelfish(Babelfish):
                 if len(translateds)>0:
                     translation=translateds[0].content
                 else:
-                    response=self.client.translate(phrase, target, None, self.source)
+                    response=self.retryingTranslate(phrase, target, None, self.source)
                     translation=response['translatedText']
                     translated = Phrase({'language':target, 'content': translation})
                     self.db.translation.addTranslation(original,translated)
