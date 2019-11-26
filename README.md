@@ -33,7 +33,7 @@ A word from the common english list is acceptable if
 
     The translation to each of the common languages (according to google translate) is a word, and that, when translated back to english, is the original word.
 
-# Sqlite Dataset
+## Sqlite Dataset
 
 To facilitate exploration, a dataset is cached as a sqlite datebase:
 
@@ -56,6 +56,39 @@ Instead of the original word, a simple hash of the word is stored instead (based
 
 The `CachedBabelfish` looks in this table first before activating the google api for a translation.  The project has tables cached for the first 100k english words and their translations to the 14 languages above languages are stored, along with the translations of those phrases back to english.
 
+
+## Python API
+
+```python
+# translate phrases to multiple languages
+# defaults to popular languages (must have
+# Google Translate API key to use)
+class Babelfish:
+    def addLangauge(langauge): pass # ex "English"
+    def removeLanguage(language): pass
+    def translate(words): pass
+    # { 'en': 'phrase', 'es': 'phrase', etc. }
+
+# As above, but uses/updates local sqlite
+# database (only needs Google API key if used
+# for uncached translation)
+class CachedBabelfish: pass
+
+class Phrase: pass # single phrase
+class PhraseTable: pass # phrase table model
+class Translate: pass # single translation
+class TranslateTable: pass # translate table model
+class Bad: pass # single bad word
+class BadTable: pass # bad table model
+
+# model for above tables.
+class Db
+  .translate
+  .phrase
+  .bad
+
+
+```
 
 
 language(text)|(con)
@@ -86,17 +119,24 @@ curl -s -X POST -H "Content-Type: application/json" \
 ```
 
 key is in lastpass note on brainwallet
+```bash
 conda create -n brainwallet python=3.7 python
 conda activate brainwallet
-
+```
 or
 
+```bash
 cd <here>
 python3 -m venv metabrainwallet
-metabrainwallet/bin/activate  # or, in windows: metabrainwallet/bin/activate.bat
+. metabrainwallet/bin/activate  # unix 
+metabrainwallet/bin/activate.bat # windows
 pip install --upgrade google-cloud-translate
 pip install --upgrade python-dotenv
+```
+either way, you need a google api key
+
+```bash
 echo 'GOOGLE_APPLICATION_CREDENTIALS="${HOME}/projects/metabrainwallet/brainwallet-7e933180334f.json"' > .env
 # save contents of brainwallet-7e933180334f.json from lastpass/brainwallet to brainwallet-7e933180334f.json
-
+```
 
