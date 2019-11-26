@@ -1,4 +1,5 @@
 class Hash:
+    """48 bit hash based on the Java Random algorithm, 32 bits created collisions, and a cryptographic hash seems like overkill"""
     A = 25214903917
     B = 11
     @classmethod

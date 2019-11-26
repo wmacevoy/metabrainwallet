@@ -6,6 +6,7 @@ from languages import LANGUAGES_100M, LANGUAGES_GOOGLE
 import dotenv, pathlib
 
 class Babelfish:
+    ERROR_TIMEOUT=4.0
     def addCommonLanguages(self):
         for language in LANGUAGES_100M:
             self.addLanguage(language)
@@ -36,23 +37,21 @@ class Babelfish:
             self._client = translate_v2.Client()
         return self._client
 
-    def close():
+    def close(self):
         if self._client != None:
-            self._client.close()
             self._client = None
-        return self._client
         
 
     def retryingTranslate(self,values,target_language=None,format_=None,source_language=None,customization_ids=(),model=None):
         while True:
             try:
-                response=self.client.translate(values,target_language,format_,ssource_language,customization_ids)
-                if resonse != None:
+                response=self.client.translate(values,target_language,format_,source_language,customization_ids)
+                if response != None:
                     return response
             except:
                 print("Unexpected error:", sys.exc_info()[0])
                 self.close()
-                time.sleep(5)
+                time.sleep(Babelfish.ERROR_TIMEOUT)
 
     def translate(self,phrase):
         translations={}
@@ -60,7 +59,7 @@ class Babelfish:
             if target == self.source:
                 translation=phrase
             else:
-                response=self.client.translate(phrase, target, None, self.source)
+                response=self.retryingTranslate(phrase, target, None, self.source)
                 translation=response['translatedText']
             translations[target]=translation
         return translations
