@@ -1,5 +1,5 @@
 from __future__ import print_function
-import os,sys,sqlite3,datetime
+import os,sys,sqlite3,time
 from badtable import BadTable
 from phrasetable import PhraseTable
 from translationtable import TranslationTable
@@ -65,25 +65,21 @@ class Db:
     def cursor(self):
         return self.connection.cursor()
 
-    def execute(self,sql,parameters=None):
+    def execute(self,sql,parameters=None,commit = True):
+        connection = self.connection
+        cursor = self.cursor()
+        t0 = time.monotonic()
         if parameters != None:
-            cursor=self.cursor()
-            t0 = datetime.datetime.now()
             cursor.execute(sql,parameters)
-            t1 = datetime.datetime.now()            
-            delta = (t1 - t0).total_seconds()
-            if delta > self._slow:
-                eprint(f"slow: {sql} parameters={repr(parameters)} in {delta}s")
-            return cursor
         else:
-            cursor=self.cursor()
-            t0 = datetime.datetime.now()
             cursor.execute(sql)
-            t1 = datetime.datetime.now()            
-            delta = (t1 - t0).total_seconds()
-            if delta > self._slow:
-                eprint(f"slow: {sql} in {delta}s")
-            return cursor
+        t1 = time.monotonic()
+        delta = t1 - t0
+        if delta > self._slow:
+            eprint(f"slow: {sql} parameters={repr(parameters)} in {delta}s")
+        if commit:
+            connection.commit()
+        return cursor
 
     def createTables(self):
         self.bad.createTable()

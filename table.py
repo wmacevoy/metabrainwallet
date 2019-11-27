@@ -34,36 +34,36 @@ class Table:
     def cursor(self):
         return self.db.cursor()
 
-    def execute(self,sql,parameters=None):
-        return self.db.execute(sql,parameters)
+    def execute(self,sql,parameters=None, commit = True):
+        return self.db.execute(sql,parameters, commit)
 
-    def createIndex(self,columns,unique=False):
+    def createIndex(self,columns,unique=False, commit = True):
         index=f"index_{self.name}_on_{'__'.join(columns)}"
         sql=f"create {'unique' if unique else ''} index if not exists {index} on {self.name}({','.join(columns)})"
-        self.execute(sql)
+        self.execute(sql, None, commit)
 
-    def dropIndex(self,columns):
+    def dropIndex(self,columns, commit = True):
         index=f"index_{self.name}_on_{'__'.join(columns)}"
         sql=f"drop index if exists {index}"
-        self.execute(sql)
+        self.execute(sql,None,commit)
         
-    def dropTable(self):
-        self.execute(f"drop table {self.name}")
+    def dropTable(self, commit = True):
+        self.execute(f"drop table {self.name}", None, commit)
         
-    def createTable(self):
+    def createTable(self, commit = True):
         columns = self.columns
         types = self.types
         decls = list(map(lambda column : column + " " + types[column]['dbType'],columns))
         declstr = ",".join(decls)
         sql = f"create table if not exists {self.name} ({declstr})"
-        self.execute(sql)
+        self.execute(sql,None,commit)
         
-    def save(self,record):
+    def save(self,record, commit = True):
         if record.id != None:
-            self.update(record.memo)
+            self.update(record.memo, commit)
         else:
             memo = record.memo
-            id = self.insert(memo)
+            id = self.insert(memo, commit)
             record.id = id
 
     def update(self, memo,commit=True):
@@ -80,9 +80,7 @@ class Table:
         parameters.append(int(memo['id']))
         updatestr = ",".join(updates)
         sql = f"update {self.name} set {updatestr} where id = ?"
-        cursor=self.execute(sql,parameters)
-        if commit:
-            cusort.commit()
+        self.execute(sql,parameters,commit)
 
     def insert(self,memo,commit=True):
         columns=self.columnsExceptId
@@ -91,9 +89,7 @@ class Table:
         questions = ",".join("?"*len(columns))
         sql = f"insert into {self.name} ({columnstr}) values ({questions})"
         parameters = list(map(lambda column: types[column]['db'](memo[column]),columns))
-        cursor = self.execute(sql,parameters)
-        if commit:
-            cursor.commit()
+        cursor = self.execute(sql,parameters,commit)
         return cursor.lastrowid
 
     def getIds(self):
@@ -105,10 +101,10 @@ class Table:
             ids[k] = int(rows[k][0])
         return ids
 
-    def deletebyId(self, id):
+    def deletebyId(self, id, commit = True):
        sql = f"delete from {self.name} where id = ?"
        parameters = (int(id))
-       self.execute(sql, parameters)
+       self.execute(sql, parameters, commit)
 
     def fullRow2Memo(self,row):
         columns=self.columns
