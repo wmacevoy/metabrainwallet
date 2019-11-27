@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from unittest import TestCase, main
+import datetime,hashlib
 from hash import Hash
 from bad import Bad
 from phrase import Phrase
@@ -58,6 +59,33 @@ class TestHash(TestCase):
         for word in badWords:
             collider.add(word)
         collider.ok()
+
+    def testTime(self):
+        phrases=Phrase.getCommon()
+        words=set()
+        for phrase in phrases:
+            words.add(phrase.content)
+        h1={}
+        t0 = datetime.datetime.now()
+        for word in words:
+            h1[word]=hash(word)
+        t1 = datetime.datetime.now()
+        d1 = (t1 - t0).total_seconds()
+
+        h2={}
+        t0 = datetime.datetime.now()
+        for word in words:
+            m = hashlib.sha256()
+            utf8=bytes(str(word),'utf-8')            
+            m.update(utf8)
+            h2[word]=m.digest()
+        t1 = datetime.datetime.now()
+        d2 = (t1 - t0).total_seconds()
+
+        print(f"ratio={d1/d2}")
+        
+        
+        
         
 
 if __name__ == '__main__':
