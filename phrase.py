@@ -31,7 +31,7 @@ class Phrase(Memoable):
     }
     
     @classmethod
-    def getCommon(cls,filename='count_1w100k.txt'):
+    def getCommon(cls,filename='count_1w100k.txt',maxCount=None):
         dir = os.path.dirname(os.path.realpath(__file__))        
         filename=dir + '/' + filename
         file = open(filename,"r",encoding="utf-8")
@@ -43,6 +43,8 @@ class Phrase(Memoable):
             if len(memo['content']) > 0:
                 phrase=Phrase(memo)
                 phrases.append(phrase)
+                if maxCount != None and len(phrases) >= maxCount:
+                    break
         file.close()
         return phrases
     

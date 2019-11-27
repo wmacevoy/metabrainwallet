@@ -66,7 +66,7 @@ class Table:
             id = self.insert(memo)
             record.id = id
 
-    def update(self, memo):
+    def update(self, memo,commit=True):
         if memo == None:
             return
         types = self.types        
@@ -80,9 +80,11 @@ class Table:
         parameters.append(int(memo['id']))
         updatestr = ",".join(updates)
         sql = f"update {self.name} set {updatestr} where id = ?"
-        self.execute(sql,parameters)
+        cursor=self.execute(sql,parameters)
+        if commit:
+            cusort.commit()
 
-    def insert(self,memo):
+    def insert(self,memo,commit=True):
         columns=self.columnsExceptId
         types=self.types
         columnstr = ",".join(columns)
@@ -90,6 +92,8 @@ class Table:
         sql = f"insert into {self.name} ({columnstr}) values ({questions})"
         parameters = list(map(lambda column: types[column]['db'](memo[column]),columns))
         cursor = self.execute(sql,parameters)
+        if commit:
+            cursor.commit()
         return cursor.lastrowid
 
     def getIds(self):

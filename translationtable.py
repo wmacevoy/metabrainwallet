@@ -41,13 +41,13 @@ class TranslationTable(Table):
         self.save(translation)
         return translation
 
-    def save(self,translation):
+    def save(self,translation,commit=True):
         sql="select id from translation where originalId = ? and translatedId = ?"
         parameters=(translation.originalId,translation.translatedId)
         cursor = self.execute(sql,parameters)
         rows = cursor.fetchall()
         if len(rows) == 0:
-            translation.id = self.insert(translation.memo)
+            translation.id = self.insert(translation.memo,commit)
         else:
             translation.id = rows[0][0]
         

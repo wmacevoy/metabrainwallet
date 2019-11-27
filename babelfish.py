@@ -11,10 +11,10 @@ class Babelfish:
         for language in LANGUAGES_100M:
             self.addLanguage(language)
 
-    def __init__(self,source='en'):
+    def __init__(self,source='English'):
         if os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')==None:
             dotenv.load_dotenv(pathlib.Path('.') / '.env')
-        self._source = source
+        self._source = LANGUAGES_GOOGLE[source]
         self._languages = set()
         self._client = None
         self.addCommonLanguages()
