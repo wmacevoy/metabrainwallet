@@ -3,11 +3,22 @@
 from cachedbabelfish import CachedBabelfish
 from bad import Bad
 from phrase import Phrase
+from languages import LANGUAGES_GOOGLE_INVERSE
 
 class Translator:
     def __init__(self):
         self._count = 0
         self._babelfish=None
+        self._reverse = {}
+
+    def reverse(self,language):
+        if not language in self._reverse:
+            reverse=CachedBabelfish(source = language)
+            reverse.dbFile = self._babelfish.dbFile
+            reverse.clearLanguages()
+            reverse.addLanguage("English")
+            self._reverse[lanaguage] = reverse
+        return self._reverse[language]
 
     @property
     def babelfish(self):
@@ -21,7 +32,11 @@ class Translator:
             self._babelfish = None
 
     def cache(self,word):
-        self.babelfish.translate(word)
+        response=self.babelfish.translate(word)
+        for code in response:
+            language = LANGUAGES_GOOGLE_INVERSE[code]
+            phrase = response[code]
+            self.reverse[language].translate(phrase)
         self._count = self._count + 1
         if self._count % 1000 == 0:
             print(f"checkpoint word={word} count={self._count}")
@@ -37,8 +52,8 @@ class Translator:
             print(f"bad word {i} of {n} cached")                        
         print(f"bad words cached")            
 
-    def common(self):
-        phrases=Phrase.getCommon()
+    def common(self, maxCount = None):
+        phrases=Phrase.getCommon(maxCount)
         n = len(phrases)
         for i in range(n):
             word=phrases[i].content
@@ -47,7 +62,9 @@ class Translator:
         printf(f"common words cached")
 
 def main():
+    maxCount = 100
     translator=Translator()
+    translator.babelfish.dbFile = "test.db"
     translator.bad()
     translator.common()
     translatr.close()

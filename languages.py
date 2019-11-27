@@ -109,6 +109,10 @@ LANGUAGES_GOOGLE={
 
 LANGUAGE_CODES = set(LANGUAGES_GOOGLE.items())
 LANGUAGE_NAMES = set(LANGUAGES_GOOGLE.keys())
+LANGUAGES_GOOGLE_INVERSE = {}
+for language in LANGUAGES_GOOGLE:
+    code = LANGUAGES_GOOGLE[language]
+    LANGUAGES_GOOGLE_INVERSE[code] = language
 
 # These are the languages spoken by 100 million or
 # more people according to www.ethnologue.com:
