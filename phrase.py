@@ -38,13 +38,14 @@ class Phrase(Memoable):
         phrases = list()
         count=0
         for wordCount in file.readlines():
+            if maxCount != None and len(phrases) >= maxCount:
+                break
             line = re.split(u"[ \u3000\r\n\t]+",wordCount,flags=re.UNICODE)
             memo = { 'language': 'en', 'content': line[0].lower(), 'frequency': int(line[1]) }
             if len(memo['content']) > 0:
                 phrase=Phrase(memo)
                 phrases.append(phrase)
-                if maxCount != None and len(phrases) >= maxCount:
-                    break
+
         file.close()
         return phrases
     

@@ -15,11 +15,17 @@ class TestPhraseTable(TestCase):
         good = Phrase({'language':'en', 'content': 'information'})
         bad = Phrase({'language':'en', 'content': 'supercalifragilisticexpialidocious'})
         empty = Phrase({'language':'en', 'content': ''})
+        
         self.assertTrue(db.phrase.contains(good))
+        
+        memos=db.phrase.loadMemosByColumns({'language':'en','content':'information'})
+        self.assertTrue(int(memos[0]['frequency']) > 0)
+
         self.assertFalse(db.phrase.contains(bad))
         self.assertFalse(db.phrase.contains(empty))
 
         db.close()
+
 
 if __name__ == '__main__':
     main()

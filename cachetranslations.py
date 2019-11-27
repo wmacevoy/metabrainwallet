@@ -14,10 +14,10 @@ class Translator:
     def reverse(self,language):
         if not language in self._reverse:
             reverse=CachedBabelfish(source = language)
-            reverse.dbFile = self._babelfish.dbFile
+            reverse.db.dbFile = self._babelfish.db.dbFile
             reverse.clearLanguages()
             reverse.addLanguage("English")
-            self._reverse[lanaguage] = reverse
+            self._reverse[language] = reverse
         return self._reverse[language]
 
     @property
@@ -36,14 +36,14 @@ class Translator:
         for code in response:
             language = LANGUAGES_GOOGLE_INVERSE[code]
             phrase = response[code]
-            self.reverse[language].translate(phrase)
+            back=self.reverse(language).translate(phrase)
         self._count = self._count + 1
         if self._count % 1000 == 0:
             print(f"checkpoint word={word} count={self._count}")
             self.close()
 
-    def bad(self):
-        words=Bad.getBadWords()
+    def bad(self, maxCount = None):
+        words=Bad.getBadWords(maxCount)
         words=list(words)
         n = len(words)
         for i in range(n):
@@ -53,21 +53,21 @@ class Translator:
         print(f"bad words cached")            
 
     def common(self, maxCount = None):
-        phrases=Phrase.getCommon(maxCount)
+        phrases=Phrase.getCommon('count_1w100k.txt',maxCount)
         n = len(phrases)
         for i in range(n):
+            self.babelfish.db.phrase.save(phrases[i])
             word=phrases[i].content
             self.cache(word)
             print(f"common word {i} of {n} cached")                        
-        printf(f"common words cached")
+        print(f"common words cached")
 
 def main():
-    maxCount = 100
     translator=Translator()
-    translator.babelfish.dbFile = "test.db"
     translator.bad()
     translator.common()
-    translatr.close()
+    translator.close()
+
     
 if __name__ == '__main__':
     main()

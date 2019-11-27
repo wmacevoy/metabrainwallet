@@ -51,12 +51,14 @@ class Bad(Memoable):
 
     # https://www.cs.cmu.edu/~biglou/resources/bad-words.txt
     @classmethod
-    def getBadWords(cls):
+    def getBadWords(cls, maxCount = None):
         dir = os.path.dirname(os.path.realpath(__file__))
         filename=dir + '/bad-words.txt'
         file = open(filename,"r",encoding="utf-8")
         badWords = set()
         for wordCount in file.readlines():
+            if maxCount != None and len(badWords) >= maxCount:
+                break
             line = re.split(u"[ \u3000\r\n\t]+",wordCount,flags=re.UNICODE)
             word = line[0].lower()
             if len(word) > 0:
