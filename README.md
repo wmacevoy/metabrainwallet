@@ -5,7 +5,7 @@ Meta Brain Wallet has a goal of making a corpus of words suitable for passphrase
 ## Phase 0 Dataset
 
 - count_1w100k.txt - 100k most popular english words according to http://norvig.com/ngrams (along with a corpus frequency)
-- bad_words.txt uncomfortable word list according to
+- bad_words.txt bad word list according to
 https://www.cs.cmu.edu/~biglou/resources/bad-words.txt
 - popular laguages (spoken by 100M or more according to ethnologue.com)
 
@@ -31,16 +31,16 @@ https://www.cs.cmu.edu/~biglou/resources/bad-words.txt
 
 A word from the common english list is acceptable if 
 
-    The translation to each of the common languages (according to google translate) is a word, and that, when translated back to english, is the original word.
+    The translation to each of the common languages (according to google translate) is a phrase, that, when translated back to english and converted to lower case, is the original word.
 
 ## Sqlite Dataset
 
 To facilitate exploration, a dataset is cached as a sqlite datebase:
 
 ### phrase
-|id|language|content|
-|----|----|----|
-|int|text|text|
+|id|language|content|frequency
+|----|----|----|----|
+|int|text|text|int or null|
 
 ### bad
 |id|word|
@@ -52,7 +52,7 @@ Instead of the original word, a simple hash of the word is stored instead (based
 ### translate
 |id|originalId|translatedId|
 |---|---|---|
-|int|int|int|
+|int|int (phrase id)|int (phrase id)|
 
 The `CachedBabelfish` looks in this table first before activating the google api for a translation.  The project has tables cached for the first 100k english words and their translations to the 14 languages above languages are stored, along with the translations of those phrases back to english.
 
