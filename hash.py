@@ -1,6 +1,13 @@
-import hashlib
-
 class Hash:
+    """ 48 bit hash based on the Java Random algorithm """
+
+    A = 25214903917
+    B = 11
+
+    @classmethod
+    def advance(cls,state):
+        return (cls.A * state + cls.B) & ((1 << 48) - 1)
+        
     @classmethod    
     def hashString(cls,string):
         if string == None:
@@ -13,10 +20,13 @@ class Hash:
     def hashBytes(cls,data):
         if data == None:
             return None
-        encoder = hashlib.sha256()
-        encoder.update(data)
-        digest = encoder.digest()
-        state = (digest[0]<<(0*8))|(digest[1]<<(1*8))|(digest[2]<<(2*8))|(digest[3]<<(3*8))|(digest[4]<<(4*8))|(digest[5]<<(5*8))
-#        n = int.from_bytes(digest, byteorder='little', signed=False)
-#        state = n & ( (1 << 48) - 1 )
+        i=0
+        n=len(data)
+        state = 0
+        while i+6<=n:
+            x=int.from_bytes(data[i:i+6],'little')
+            state = cls.advance(state ^ x)
+            i = i + 6
+        x=int.from_bytes(data[i:n],'little') + (1 << (8*(n-i)))
+        state = cls.advance(state ^ x)
         return state
