@@ -39,13 +39,13 @@ class TestHash(TestCase):
 
     def testEmpty(self):
         word=""
-        expect=245048209962137
+        expect=277730885415139
         result=hash(word)
         self.assertEqual(expect,result)
 
     def testTest(self):
         word="test"
-        expect=131165637339759
+        expect=84149177190047
         result=hash(word)
         self.assertEqual(expect,result)
 
