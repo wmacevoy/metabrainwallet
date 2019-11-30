@@ -1,10 +1,13 @@
 class Hash:
-    """48 bit hash based on the Java Random algorithm, 32 bits created collisions, and a cryptographic hash seems like overkill"""
+    """ 48 bit hash based on the Java Random algorithm """
+
     A = 25214903917
     B = 11
+
     @classmethod
     def advance(cls,state):
         return (cls.A * state + cls.B) & ((1 << 48) - 1)
+        
     @classmethod    
     def hashString(cls,string):
         if string == None:

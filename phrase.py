@@ -2,6 +2,9 @@ import sys,os,re
 from memoable import Memoable
 
 class Phrase(Memoable):
+    """ A phrase represents a (possibly partial) row from the phrase table,
+    language is the google language code (often two letters) and content is
+    the text"""
     TABLE="phrase"
     TYPES={
         'id' : {
