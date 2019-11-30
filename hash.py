@@ -1,3 +1,5 @@
+import hashlib
+
 class Hash:
     """ 48 bit hash based on the Java Random algorithm """
 
@@ -20,13 +22,8 @@ class Hash:
     def hashBytes(cls,data):
         if data == None:
             return None
-        i=0
-        n=len(data)
-        state = 0
-        while i+6<=n:
-            x=int.from_bytes(data[i:i+6],'little')
-            state = cls.advance(state ^ x)
-            i = i + 6
-        x=int.from_bytes(data[i:n],'little') + (1 << (8*(n-i)))
-        state = cls.advance(state ^ x)
+        encoder = hashlib.sha256()
+        encoder.update(data)
+        digest = encoder.digest()
+        state = int.from_bytes(digest[0:6],'little')
         return state
