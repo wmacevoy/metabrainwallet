@@ -15,8 +15,17 @@ class Word:
         self.csv = csv
         self.phrases={}
 
+    def isSimilar(self):
+        similar = True
+        sameLanguages=self.phrases[self.current]
+        for language in [ "en", "zh-CN", "zh-TW", "hi", "es" ]:
+            similar = similar and (language in sameLanguages)
+        similar = similar and self.same >= len(LANGUAGES_100M)-1
+        similar = similar and self.similar >= len(LANGUAGES_100M)
+        return similar
+    
     def setup(self,current,frequency):
-        if self.current != None:
+        if self.current != None and self.isSimilar():
             equiv = []
             for phrase in self.phrases:
                 langs=list(self.phrases[phrase])
@@ -47,7 +56,7 @@ class Word:
 class CSV:
     def __init__(self):
         self.db = Db()
-        self.csvFileName = "join.csv"
+        self.csvFileName = "similar.csv"
 
     def generate(self):
         sql = f"""
