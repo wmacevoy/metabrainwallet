@@ -15,20 +15,38 @@ class Word:
         self.csv = csv
         self.phrases={}
 
+    def hasVowel(self):
+        for vowel in ['a','e','i','o','u','y']:
+            if self.current.find(vowel) >= 0:
+                return True
+        return False
+
     def isSimilar(self):
         similar = True
         sameLanguages=self.phrases[self.current]
-        for language in [ "en", "zh-CN", "zh-TW", "hi", "es" ]:
+#        some=False
+        for language in [ "zh-CN", "zh-TW", "hi", "es" ]:
+            # these languages translate the word into a phrase that translates back into the word
             similar = similar and (language in sameLanguages)
+#            if similar and sameLanguages[language] != self.current:
+#                some = True
+        # spanish se languages translate the word into a phrase different than the original word
+        similar = similar and sameLanguages['es'] != self.current
         similar = similar and self.same >= len(LANGUAGES_100M)
         similar = similar and self.similar >= len(LANGUAGES_100M)
+        similar = similar and len(self.current)<=8        
+#        similar = similar and len(self.current)>2 and len(self.current)<=8
+#        similar = similar and self.hasVowel()
+#        similar = similar and not self.current in Word.ODD
+#        similar = similar and self.frequency >= 1500000
+        
         return similar
     
     def setup(self,current,frequency):
         if self.current != None and self.isSimilar():
             equiv = []
             for phrase in self.phrases:
-                langs=list(self.phrases[phrase])
+                langs=list(self.phrases[phrase].keys())
                 langs.sort()
                 equiv.append(phrase + "(" + ",".join(langs) + ")")
             allPhrases="&".join(equiv)
@@ -40,13 +58,13 @@ class Word:
         self.similar=0
         self.phrases={}
         if current != None:
-            self.addTranslation('en',self.current)
+            self.addTranslation('en',self.current,self.current)
 
-    def addTranslation(self,language,phrase):
+    def addTranslation(self,language,translated,phrase):
         phrase = norm(phrase)
         if not phrase in self.phrases:
-            self.phrases[phrase]=set()
-        self.phrases[phrase].add(language)
+            self.phrases[phrase]={}
+        self.phrases[phrase][language]=translated
         if self.current == phrase:
             self.same += 1
             self.similar += 1
@@ -77,7 +95,7 @@ class CSV:
             (frequency,englishWord,translatedLanguage,translatedPhrase,translatedPhraseInEnglish,)=row
             if word.current != englishWord:
                 word.setup(englishWord,frequency)
-            word.addTranslation(translatedLanguage,translatedPhraseInEnglish)
+            word.addTranslation(translatedLanguage,translatedPhrase,translatedPhraseInEnglish)
         word.setup(None,None)
         csv.close()
 
