@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
+import sys,re
 from cachedbabelfish import CachedBabelfish
 from bad import Bad
 from phrase import Phrase
@@ -10,6 +11,8 @@ class Translator:
         self._count = 0
         self._babelfish=None
         self._reverse = {}
+        self.dry = False
+        self.verbose = False
 
     def reverse(self,language):
         if not language in self._reverse:
@@ -25,6 +28,10 @@ class Translator:
         if self._babelfish == None:
             self._babelfish=CachedBabelfish()
         return self._babelfish
+
+    @property
+    def db(self):
+        return self.babelfish.db
 
     def close(self):
         if self._babelfish != None:
@@ -44,6 +51,7 @@ class Translator:
 
     def bad(self, maxCount = None):
         words=Bad.getBadWords(maxCount)
+        db.bad.addAll(words)
         words=list(words)
         n = len(words)
         for i in range(n):
@@ -54,6 +62,7 @@ class Translator:
 
     def common(self, maxCount = None):
         phrases=Phrase.getCommon('count_1w100k.txt',maxCount)
+        db.phrase.addAll(phrases)
         n = len(phrases)
         for i in range(n):
             self.babelfish.db.phrase.save(phrases[i])
@@ -62,12 +71,53 @@ class Translator:
             print(f"common word {i} of {n} cached")                        
         print(f"common words cached")
 
-def main():
-    translator=Translator()
-    translator.bad()
-    translator.common()
-    translator.close()
+    def option(self,result,index,convert,default):
+        if result != None:
+            groups=result.groups()
+            if index < len(groups) and groups[index] != None:
+                return groups[index]
+        return default
+                
+    def cli(self,commands):
+        for command in commands:
+            result = re.match(r"^--?dry(==?(true|false))?$",command)
+            if result != None:
+                self.dry = self.option(result,1,lambda x: x == "true", True)
+                continue
+            
+            result=re.match(r"^--?verbose(==?(true|false))?$",command)
+            if result != None:
+                self.verbose = self.option(result,1,lambda x: x == "true", True)
+                continue
+                
+            result=re.match(r"^--?common(==?([0-9]+))?$",command)
+            if result != None:
+                maxCount = self.option(result,1,lambda x: int(x), None)
+                if self.verbose: print(f"common({maxCount})")
+                if not self.dry: self.common(maxCount)
+                continue
+                
+            result=re.match(r"^--?bad(==?([0-9]+))?$",command)
+            if result != None:
+                maxCount = self.option(result,1,lambda x: int(x), None)
+                if self.verbose: print(f"bad({maxCount})")                
+                if not self.dry: self.bad(maxCount)
+                continue
 
-    
+            result=re.match(r"^--?db==?(.*)$",command)
+            if result != None:
+                dbFile=self.option(result,0,lambda x: str(x), None)
+                if self.verbose: print(f"dbFile={dbFile}")
+                self.db.dbFile=dbFile
+                continue
+            
+            raise Exception(f"unknown command '{command}'")
+
+def main():
+    args = sys.argv
+    args.pop(0)
+    translator=Translator()
+    translator.cli(args)
+
 if __name__ == '__main__':
     main()
