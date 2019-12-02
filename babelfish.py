@@ -17,6 +17,7 @@ class Babelfish:
         self._source = LANGUAGES_GOOGLE[source]
         self._languages = set()
         self._client = None
+        self.retry = True
         self.addCommonLanguages()
 
     def addLanguage(self,language):
@@ -43,15 +44,19 @@ class Babelfish:
         
 
     def retryingTranslate(self,values,target_language=None,format_=None,source_language=None,customization_ids=(),model=None):
-        while True:
-            try:
-                response=self.client.translate(values,target_language,format_,source_language,customization_ids)
-                if response != None:
-                    return response
-            except:
-                print("Unexpected error:", sys.exc_info()[0])
-                self.close()
-                time.sleep(Babelfish.ERROR_TIMEOUT)
+        if self.retry:
+            while True:
+                try:
+                    response=self.client.translate(values,target_language,format_,source_language,customization_ids)
+                    if response != None:
+                        return response
+                except:
+                    print("Unexpected error:", sys.exc_info()[0])
+                    self.close()
+                    time.sleep(Babelfish.ERROR_TIMEOUT)
+        else:
+            response=self.client.translate(values,target_language,format_,source_language,customization_ids)
+            return response
 
     def translate(self,phrase):
         translations={}
