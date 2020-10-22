@@ -140,3 +140,4 @@ echo 'GOOGLE_APPLICATION_CREDENTIALS="${HOME}/projects/metabrainwallet/brainwall
 # save contents of brainwallet-7e933180334f.json from lastpass/brainwallet to brainwallet-7e933180334f.json
 ```
 
+Google doc notes: https://docs.google.com/document/d/15SuibsV07JhWuudIad00aD5CqDTpzUM3xRgOO8mDdnk/edit
